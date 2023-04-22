@@ -1,3 +1,3 @@
-import * as wasm from "resource-management-simulator";
+import { Env } from "resource-management-simulator";
 
-wasm.greet();
+const env = Env.new();

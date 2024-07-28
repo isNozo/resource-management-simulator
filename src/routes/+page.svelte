@@ -7,42 +7,89 @@
   };
   let resources: Resource[] = [];
 
-  let inputText: string = '';
+  type Recipe = {
+    id: string;
+    name: string;
+    consumedResources: Resource[];
+    producedResources: Resource[];
+  };
+  let recipes: Recipe[] = [];
 
-  // ページロード時にローカルストレージからデータを取得
+  let inputNameResource: string = '';
+  let inputNameRecipe: string = '';
+
+  // Retrieve data from local storage when the page loads
   onMount(() => {
-    const saved = localStorage.getItem('savedResources');
-    if (saved) {
-      resources = JSON.parse(saved);
+    const savedResources = localStorage.getItem('savedResources');
+    if (savedResources) {
+      resources = JSON.parse(savedResources);
+    }
+    const savedRecipes = localStorage.getItem('savedRecipes');
+    if (savedRecipes) {
+      recipes = JSON.parse(savedRecipes);
     }
   });
 
-  // フォームに入力されたテキストのresourceを保存する
-  function handleSave() {
+  // Save the resource with the text input to local storage
+  function handleSaveResource() {
     resources.push({
       id: crypto.randomUUID(),
-      name: inputText,
+      name: inputNameResource,
     });
     resources = resources;
-    // ローカルストレージにデータを保存
+    // Save the data to local storage
     localStorage.setItem('savedResources', JSON.stringify(resources));
   }
 
-  // リソースを削除する
-  function handleDelete(id: string) {
+  // Save the recipe with the text input to local storage
+  function handleSaveRecipe() {
+    recipes.push({
+      id: crypto.randomUUID(),
+      name: inputNameRecipe,
+      consumedResources: [],
+      producedResources: [],
+    });
+    recipes = recipes;
+    localStorage.setItem('savedRecipes', JSON.stringify(recipes));
+  }
+
+  // Delete the resource
+  function handleDeleteResource(id: string) {
     resources = resources.filter((resource) => resource.id !== id);
     resources = resources;
     localStorage.setItem('savedResources', JSON.stringify(resources));
   }
+
+  // Delete the recipe
+  function handleDeleteRecipe(id: string) {
+    recipes = recipes.filter((recipe) => recipe.id !== id);
+    recipes = recipes;
+    localStorage.setItem('savedRecipes', JSON.stringify(recipes));
+  }
 </script>
 
-<input type="text" bind:value={inputText} placeholder="テキスト入力フォーム" />
-<button on:click={handleSave}>実行</button>
+<h2>Resource List</h2>
+<input type="text" bind:value={inputNameResource} placeholder="Resource Name" />
+<button on:click={handleSaveResource}>Create Resource</button>
 <ul>
   {#each resources as resource}
     <li>
-      <button on:click={() => handleDelete(resource.id)}>削除</button>
+      <button on:click={() => handleDeleteResource(resource.id)}>Delete</button>
       {resource.id}: {resource.name}
+    </li>
+  {/each}
+</ul>
+
+<h2>Recipe List</h2>
+<input type="text" bind:value={inputNameRecipe} placeholder="Recipe Name" />
+<button on:click={handleSaveRecipe}>Create Recipe</button>
+<ul>
+  {#each recipes as recipe}
+    <li>
+      <button on:click={() => handleDeleteRecipe(recipe.id)}>Delete</button>
+      {recipe.id}: {recipe.name}
+      <p>Consumed Resources: {#each recipe.consumedResources as resource}{resource.name}{/each}</p>
+      <p>Produced Resources: {#each recipe.producedResources as resource}{resource.name}{/each}</p>
     </li>
   {/each}
 </ul>

@@ -1,24 +1,38 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
 
-  let inputText = '';
-  let savedText = '';
+  type Resource = {
+    id: number;
+    name: string;
+  };
+  let resources: Resource[] = [];
+
+  let inputText: string = '';
 
   // ページロード時にローカルストレージからデータを取得
   onMount(() => {
-    const saved = localStorage.getItem('savedText');
+    const saved = localStorage.getItem('savedResources');
     if (saved) {
-      savedText = saved;
+      resources = JSON.parse(saved);
     }
   });
 
+  // フォームに入力されたテキストのresourceを保存する
   function handleSave() {
-    savedText = inputText;
+    resources.push({
+      id: resources.length + 1,
+      name: inputText,
+    });
+    resources = resources;
     // ローカルストレージにデータを保存
-    localStorage.setItem('savedText', savedText);
+    localStorage.setItem('savedResources', JSON.stringify(resources));
   }
 </script>
 
 <input type="text" bind:value={inputText} placeholder="テキスト入力フォーム" />
 <button on:click={handleSave}>実行</button>
-<p>保存されたテキスト: {savedText}</p>
+<ul>
+  {#each resources as resource}
+    <li>{resource.id}: {resource.name}</li>
+  {/each}
+</ul>

@@ -41,13 +41,21 @@
     localStorage.setItem('savedResources', JSON.stringify(resources));
   }
 
+  let selectedConsumedResource: string = '';
+  let selectedProducedResource: string = '';
+  
   // Save the recipe with the text input to local storage
   function handleSaveRecipe() {
+    const consumedResource = resources.find(r => r.id === selectedConsumedResource);
+    const producedResource = resources.find(r => r.id === selectedProducedResource);
+    if (!consumedResource || !producedResource) {
+      return;
+    }
     recipes.push({
       id: crypto.randomUUID(),
       name: inputNameRecipe,
-      consumedResources: [],
-      producedResources: [],
+      consumedResources: [consumedResource],
+      producedResources: [producedResource],
     });
     recipes = recipes;
     localStorage.setItem('savedRecipes', JSON.stringify(recipes));
@@ -68,6 +76,8 @@
   }
 </script>
 
+<button on:click={() => { localStorage.clear(); recipes = []; resources = []; }}>Clear Local Storage</button>
+
 <h2>Resource List</h2>
 <input type="text" bind:value={inputNameResource} placeholder="Resource Name" />
 <button on:click={handleSaveResource}>Create Resource</button>
@@ -82,6 +92,20 @@
 
 <h2>Recipe List</h2>
 <input type="text" bind:value={inputNameRecipe} placeholder="Recipe Name" />
+<label for="consumedResource">ConsumedResource:</label>
+<select id="consumedResource" bind:value={selectedConsumedResource}>
+  <option value="">select</option>
+  {#each resources as resource}
+    <option value={resource.id}>{resource.name}</option>
+  {/each}
+</select>
+<label for="producedResource">ProducedResource:</label>
+<select id="producedResource" bind:value={selectedProducedResource}>
+  <option value="">select</option>
+  {#each resources as resource}
+    <option value={resource.id}>{resource.name}</option>
+  {/each}
+</select>
 <button on:click={handleSaveRecipe}>Create Recipe</button>
 <ul>
   {#each recipes as recipe}

@@ -2,6 +2,7 @@
 type Resource = {
   id: string;
   name: string;
+  amount: number;
 };
 
 type Recipe = {

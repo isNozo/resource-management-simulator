@@ -8,6 +8,7 @@
     $resources.push({
       id: crypto.randomUUID(),
       name: inputNameResource,
+      amount: 0
     });
     $resources = $resources;
   }

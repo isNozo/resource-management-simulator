@@ -27,7 +27,7 @@
   {#each $resources as resource}
     <li>
       <button on:click={() => handleDeleteResource(resource.id)}>Delete</button>
-      {resource.id}: {resource.name}
+      {resource.id}: {resource.name} {resource.amount}
     </li>
   {/each}
 </ul>

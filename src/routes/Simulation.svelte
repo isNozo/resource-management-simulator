@@ -1,13 +1,14 @@
 <script lang="ts">
+  import { findRecipe } from "$lib/utils"
   import { resources, recipes } from './store';
   let selectedRecipe: string = '';
 
   function simulate(recipeID: string) {
     let newResources = $resources;
-    let recipe = $recipes.find((recipe) => recipe.id === recipeID);
-    if (!recipe) {
-      return;
-    }
+    
+    let recipe = findRecipe($recipes, recipeID);
+    if (!recipe) return;
+
     newResources = newResources.map((resource) => {
       for (let consumedResource of recipe.consumedResources) {
         if (resource.id === consumedResource.id) {

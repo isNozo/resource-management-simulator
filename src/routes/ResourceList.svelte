@@ -1,33 +1,30 @@
 <script lang="ts">
+  import { addResource, removeResource } from "$lib/utils"
   import { resources } from "./store"
 
-  let inputNameResource: string = '';
+  let inputName: string = '';
 
-  // Save the resource with the text input to local storage
-  function handleSaveResource() {
-    $resources.push({
+  function handleCreateResource() {
+    $resources = addResource($resources, {
       id: crypto.randomUUID(),
-      name: inputNameResource,
+      name: inputName,
       amount: 0
     });
-    $resources = $resources;
   }
 
-  // Delete the resource
   function handleDeleteResource(id: string) {
-    $resources = $resources.filter(($resource) => $resource.id !== id);
-    $resources = $resources;
+    $resources = removeResource($resources, id);
   }
 </script>
 
 <h2>Resource List</h2>
-<input type="text" bind:value={inputNameResource} placeholder="Resource Name" />
-<button on:click={handleSaveResource}>Create Resource</button>
+<input type="text" bind:value={inputName} placeholder="Resource Name" />
+<button on:click={handleCreateResource}>Create Resource</button>
 <ul>
   {#each $resources as resource}
     <li>
       <button on:click={() => handleDeleteResource(resource.id)}>Delete</button>
-      {resource.id}: {resource.name} {resource.amount}
+      {resource.name}:{resource.amount}
     </li>
   {/each}
 </ul>

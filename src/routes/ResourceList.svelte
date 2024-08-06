@@ -24,7 +24,7 @@
 	{#each $resources as resource}
 		<li>
 			<button on:click={() => handleDeleteResource(resource.id)}>Delete</button>
-			{resource.name}:{resource.amount}
+			<input type="number" bind:value={resource.amount} /> {resource.name}
 		</li>
 	{/each}
 </ul>

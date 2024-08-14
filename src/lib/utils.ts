@@ -10,6 +10,10 @@ export function findResource(resources: Resource[], id: string): Resource | unde
 	return resources.find((r) => r.id === id);
 }
 
+export function copyResources(resources: Resource[]): Resource[] {
+	return resources.map((r) => ({...r}));
+}
+
 export function addRecipe(recipes: Recipe[], recipe: Recipe): Recipe[] {
 	return [...recipes, recipe];
 }
@@ -20,6 +24,15 @@ export function removeRecipe(recipes: Recipe[], id: string): Recipe[] {
 
 export function findRecipe(recipes: Recipe[], id: string): Recipe | undefined {
 	return recipes.find((r) => r.id === id);
+}
+
+export function copyRecipes(recipes: Recipe[]): Recipe[] {
+	return recipes.map((r) => ({
+		id: r.id,
+		name: r.name,
+		consumedResources: copyResources(r.consumedResources),
+		producedResources: copyResources(r.producedResources)
+	}));
 }
 
 export function isRecipeApplicable(resources: Resource[], recipe: Recipe): boolean {
@@ -34,7 +47,7 @@ export function applyRecipe(resources: Resource[], recipe: Recipe): Resource[] {
 		return resources;
 	}
 
-	let newResources = resources;
+	let newResources = copyResources(resources);
 
 	newResources = newResources.map((resource) => {
 		for (let consumedResource of recipe.consumedResources) {

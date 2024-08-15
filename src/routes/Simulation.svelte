@@ -5,9 +5,12 @@
 
 	function simulate(recipeID: string) {
 		let recipe = findRecipe($recipes, recipeID);
-		if (!recipe || !isRecipeApplicable($resources, recipe)) return;
+		if (!recipe) return;
 
-		$resources = applyRecipe($resources, recipe);
+		let newResources = applyRecipe($resources, recipe);
+		if (!newResources) return;
+		
+		$resources = newResources;
 	}
 </script>
 

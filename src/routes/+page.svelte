@@ -2,6 +2,7 @@
 	import ResourceList from './ResourceList.svelte';
 	import RecipeList from './RecipeList.svelte';
 	import Simulation from './Simulation.svelte';
+	import Analyze from './Analyze.svelte';
 	import { resources, recipes } from './store';
 </script>
 
@@ -13,5 +14,6 @@
 	}}>Clear Local Storage</button
 >
 <Simulation />
+<Analyze />
 <ResourceList />
 <RecipeList />

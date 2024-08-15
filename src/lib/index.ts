@@ -11,3 +11,12 @@ type Recipe = {
 	consumedResources: Resource[];
 	producedResources: Resource[];
 };
+
+type State = {
+	id: string;
+	resources: Resource[];
+	nextStates: {
+		recipeID: string;
+		stateID: string;
+	}[]
+}

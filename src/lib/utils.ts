@@ -35,6 +35,18 @@ export function copyRecipes(recipes: Recipe[]): Recipe[] {
 	}));
 }
 
+export function addState(states: State[], state: State): State[] {
+	return [...states, state];
+}
+
+export function removeState(states: State[], id: string): State[] {
+	return states.filter((s) => s.id !== id);
+}
+
+export function findState(states: State[], id: string): State | undefined {
+	return states.find((s) => s.id === id);
+}
+
 export function isRecipeApplicable(resources: Resource[], recipe: Recipe): boolean {
 	return recipe.consumedResources.every((r) => {
 		const resource = findResource(resources, r.id);
@@ -42,9 +54,9 @@ export function isRecipeApplicable(resources: Resource[], recipe: Recipe): boole
 	});
 }
 
-export function applyRecipe(resources: Resource[], recipe: Recipe): Resource[] {
+export function applyRecipe(resources: Resource[], recipe: Recipe): Resource[] | undefined {
 	if (!isRecipeApplicable(resources, recipe)) {
-		return resources;
+		return undefined;
 	}
 
 	let newResources = copyResources(resources);
@@ -64,4 +76,21 @@ export function applyRecipe(resources: Resource[], recipe: Recipe): Resource[] {
 	});
 
 	return newResources;
+}
+
+export function applyAllRecipes(resources: Resource[], recipes: Recipe[]): State[] {
+	let states : State[] = [];
+
+	recipes.forEach(recipe => {
+		const newResources = applyRecipe(resources, recipe);
+		if (newResources) {
+			states = addState(states, {
+				id: recipe.name,
+				resources: newResources,
+				nextStates: []
+			});
+		}
+	});
+
+	return states;
 }

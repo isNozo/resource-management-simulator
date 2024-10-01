@@ -3,6 +3,7 @@
 	import RecipeList from './RecipeList.svelte';
 	import Simulation from './Simulation.svelte';
 	import Analyze from './Analyze.svelte';
+	import Flow from './Flow.svelte';
 	import { resources, recipes } from './store';
 </script>
 
@@ -17,3 +18,4 @@
 <Analyze />
 <ResourceList />
 <RecipeList />
+<Flow />

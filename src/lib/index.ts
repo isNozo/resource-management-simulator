@@ -5,7 +5,7 @@ type Resource = {
 	amount: number;
 };
 
-type Recipe = {
+type Action = {
 	id: string;
 	name: string;
 	consumedResources: Resource[];

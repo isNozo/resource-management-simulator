@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { addRecipe, removeRecipe } from '$lib/utils';
-	import { recipes } from './store';
+	import { addAction, removeAction } from '$lib/utils';
+	import { actions } from './store';
 	import RecipeList_ResourceEdit from './RecipeList_ResourceEdit.svelte';
 
 	let inputName: string = '';
 
-	function handleCreateRecipe() {
-		$recipes = addRecipe($recipes, {
+	function handleCreateAction() {
+		$actions = addAction($actions, {
 			id: crypto.randomUUID(),
 			name: inputName,
 			consumedResources: [],
@@ -14,21 +14,21 @@
 		});
 	}
 
-	function handleDeleteRecipe(id: string) {
-		$recipes = removeRecipe($recipes, id);
+	function handleDeleteAction(id: string) {
+		$actions = removeAction($actions, id);
 	}
 </script>
 
-<h2>Recipe List</h2>
-<input type="text" bind:value={inputName} placeholder="Recipe Name" />
-<button on:click={handleCreateRecipe}>Create Recipe</button>
+<h2>Action List</h2>
+<input type="text" bind:value={inputName} placeholder="Action Name" />
+<button on:click={handleCreateAction}>Create Action</button>
 <ul>
-	{#each $recipes as recipe}
+	{#each $actions as action}
 		<li>
-			<button on:click={() => handleDeleteRecipe(recipe.id)}>Delete</button>
-			{recipe.name}
-			<RecipeList_ResourceEdit {recipe} type="Consumed" />
-			<RecipeList_ResourceEdit {recipe} type="Produced" />
+			<button on:click={() => handleDeleteAction(action.id)}>Delete</button>
+			{action.name}
+			<RecipeList_ResourceEdit {action} type="Consumed" />
+			<RecipeList_ResourceEdit {action} type="Produced" />
 		</li>
 	{/each}
 </ul>

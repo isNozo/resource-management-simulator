@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { addResource, removeResource, findResource } from '$lib/utils';
-	import { resources, recipes } from './store';
+	import { resources, actions } from './store';
 
-	export let recipe: Recipe;
+	export let action: Action;
 	export let type: string;
 	let selectedResource: string = '';
 	let inputAmount: number = 0;
 
-	// Add the resource to the recipe
+	// Add the resource to the action
 	function handleAddResource(resourceId: string, amount: number) {
 		let resource = findResource($resources, resourceId);
 		if (!resource) return;
@@ -19,21 +19,21 @@
 		};
 
 		if (type === 'Consumed') {
-			recipe.consumedResources = addResource(recipe.consumedResources, newResource);
+			action.consumedResources = addResource(action.consumedResources, newResource);
 		} else if (type === 'Produced') {
-			recipe.producedResources = addResource(recipe.producedResources, newResource);
+			action.producedResources = addResource(action.producedResources, newResource);
 		}
-		$recipes = $recipes;
+		$actions = $actions;
 	}
 
-	// Delete the resource from the recipe
+	// Delete the resource from the action
 	function handleDeleteResource(resourceId: string) {
 		if (type === 'Consumed') {
-			recipe.consumedResources = removeResource(recipe.consumedResources, resourceId);
+			action.consumedResources = removeResource(action.consumedResources, resourceId);
 		} else if (type === 'Produced') {
-			recipe.producedResources = removeResource(recipe.producedResources, resourceId);
+			action.producedResources = removeResource(action.producedResources, resourceId);
 		}
-		$recipes = $recipes;
+		$actions = $actions;
 	}
 </script>
 
@@ -50,14 +50,14 @@
 </p>
 <ul>
 	{#if type === 'Consumed'}
-		{#each recipe.consumedResources as resource}
+		{#each action.consumedResources as resource}
 			<li>
 				<button on:click={() => handleDeleteResource(resource.id)}>Delete</button>
 				{resource.name}: {resource.amount}
 			</li>
 		{/each}
 	{:else if type === 'Produced'}
-		{#each recipe.producedResources as resource}
+		{#each action.producedResources as resource}
 			<li>
 				<button on:click={() => handleDeleteResource(resource.id)}>Delete</button>
 				{resource.name}: {resource.amount}

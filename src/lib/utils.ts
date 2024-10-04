@@ -14,24 +14,24 @@ export function copyResources(resources: Resource[]): Resource[] {
 	return resources.map((r) => ({...r}));
 }
 
-export function addRecipe(recipes: Recipe[], recipe: Recipe): Recipe[] {
-	return [...recipes, recipe];
+export function addAction(actions: Action[], action: Action): Action[] {
+	return [...actions, action];
 }
 
-export function removeRecipe(recipes: Recipe[], id: string): Recipe[] {
-	return recipes.filter((r) => r.id !== id);
+export function removeAction(actions: Action[], id: string): Action[] {
+	return actions.filter((a) => a.id !== id);
 }
 
-export function findRecipe(recipes: Recipe[], id: string): Recipe | undefined {
-	return recipes.find((r) => r.id === id);
+export function findAction(actions: Action[], id: string): Action | undefined {
+	return actions.find((a) => a.id === id);
 }
 
-export function copyRecipes(recipes: Recipe[]): Recipe[] {
-	return recipes.map((r) => ({
-		id: r.id,
-		name: r.name,
-		consumedResources: copyResources(r.consumedResources),
-		producedResources: copyResources(r.producedResources)
+export function copyActions(actions: Action[]): Action[] {
+	return actions.map((a) => ({
+		id: a.id,
+		name: a.name,
+		consumedResources: copyResources(a.consumedResources),
+		producedResources: copyResources(a.producedResources)
 	}));
 }
 
@@ -47,27 +47,27 @@ export function findState(states: State[], id: string): State | undefined {
 	return states.find((s) => s.id === id);
 }
 
-export function isRecipeApplicable(resources: Resource[], recipe: Recipe): boolean {
-	return recipe.consumedResources.every((r) => {
+export function isActionApplicable(resources: Resource[], action: Action): boolean {
+	return action.consumedResources.every((r) => {
 		const resource = findResource(resources, r.id);
 		return resource !== undefined && resource.amount >= r.amount;
 	});
 }
 
-export function applyRecipe(resources: Resource[], recipe: Recipe): Resource[] | undefined {
-	if (!isRecipeApplicable(resources, recipe)) {
+export function applyAction(resources: Resource[], action: Action): Resource[] | undefined {
+	if (!isActionApplicable(resources, action)) {
 		return undefined;
 	}
 
 	let newResources = copyResources(resources);
 
 	newResources = newResources.map((resource) => {
-		for (let consumedResource of recipe.consumedResources) {
+		for (let consumedResource of action.consumedResources) {
 			if (resource.id === consumedResource.id) {
 				resource.amount -= consumedResource.amount;
 			}
 		}
-		for (let producedResource of recipe.producedResources) {
+		for (let producedResource of action.producedResources) {
 			if (resource.id === producedResource.id) {
 				resource.amount += producedResource.amount;
 			}
@@ -78,14 +78,14 @@ export function applyRecipe(resources: Resource[], recipe: Recipe): Resource[] |
 	return newResources;
 }
 
-export function applyAllRecipes(resources: Resource[], recipes: Recipe[]): State[] {
+export function applyAllActions(resources: Resource[], actions: Action[]): State[] {
 	let states : State[] = [];
 
-	recipes.forEach(recipe => {
-		const newResources = applyRecipe(resources, recipe);
+	actions.forEach(action => {
+		const newResources = applyAction(resources, action);
 		if (newResources) {
 			states = addState(states, {
-				id: recipe.name,
+				id: action.name,
 				resources: newResources,
 				nextStates: []
 			});

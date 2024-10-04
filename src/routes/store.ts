@@ -2,7 +2,7 @@ import { browser } from '$app/environment'
 import { writable } from 'svelte/store';
 
 export let resources = writable([] as Resource[]);
-export let recipes = writable([] as Recipe[]);
+export let actions = writable([] as Action[]);
 
 if (browser) {
 	const savedResources = localStorage.getItem('savedResources');
@@ -10,16 +10,16 @@ if (browser) {
 		resources = writable(JSON.parse(savedResources));
 	}
 
-	const savedRecipes = localStorage.getItem('savedRecipes');
-	if (savedRecipes) {
-		recipes = writable(JSON.parse(savedRecipes));
+	const savedActions = localStorage.getItem('savedActions');
+	if (savedActions) {
+		actions = writable(JSON.parse(savedActions));
 	}
 
 	resources.subscribe(value => {
 		localStorage.setItem('savedResources', JSON.stringify(value));
 	});
 
-	recipes.subscribe(value => {
-		localStorage.setItem('savedRecipes', JSON.stringify(value));
+	actions.subscribe(value => {
+		localStorage.setItem('savedActions', JSON.stringify(value));
 	});
 }

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { applyAllRecipes } from '$lib/utils';
-	import { resources, recipes } from './store';
+	import { applyAllActions } from '$lib/utils';
+	import { resources, actions } from './store';
 
-	$: states = applyAllRecipes($resources, $recipes);
+	$: states = applyAllActions($resources, $actions);
 </script>
 
 <h2>Analyze</h2>

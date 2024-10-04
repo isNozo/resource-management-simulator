@@ -4,14 +4,14 @@
 	import Simulation from './Simulation.svelte';
 	import Analyze from './Analyze.svelte';
 	import Flow from './Flow.svelte';
-	import { resources, recipes } from './store';
+	import { resources, actions } from './store';
 </script>
 
 <button
 	on:click={() => {
 		localStorage.clear();
 		$resources = [];
-		$recipes = [];
+		$actions = [];
 	}}>Clear Local Storage</button
 >
 <Simulation />

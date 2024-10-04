@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ResourceList from './ResourceList.svelte';
-	import RecipeList from './RecipeList.svelte';
+	import ActionList from './ActionList.svelte';
 	import Simulation from './Simulation.svelte';
 	import Analyze from './Analyze.svelte';
 	import Flow from './Flow.svelte';
@@ -17,5 +17,5 @@
 <Simulation />
 <Analyze />
 <ResourceList />
-<RecipeList />
+<ActionList />
 <Flow />

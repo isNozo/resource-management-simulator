@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { addAction, removeAction } from '$lib/utils';
 	import { actions } from './store';
-	import RecipeList_ResourceEdit from './RecipeList_ResourceEdit.svelte';
+	import ActionList_ResourceEdit from './ActionList_ResourceEdit.svelte';
 
 	let inputName: string = '';
 
@@ -27,8 +27,8 @@
 		<li>
 			<button on:click={() => handleDeleteAction(action.id)}>Delete</button>
 			{action.name}
-			<RecipeList_ResourceEdit {action} type="Consumed" />
-			<RecipeList_ResourceEdit {action} type="Produced" />
+			<ActionList_ResourceEdit {action} type="Consumed" />
+			<ActionList_ResourceEdit {action} type="Produced" />
 		</li>
 	{/each}
 </ul>

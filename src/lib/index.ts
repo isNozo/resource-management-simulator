@@ -17,4 +17,11 @@ type State = {
 	resources: Resource[];
 }
 
+type Transition = {
+	id: string;
+	label: string;
+	source: string;
+	target: string;
+}
+
 type Identifiable = { id: string };

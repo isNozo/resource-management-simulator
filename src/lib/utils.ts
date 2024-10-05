@@ -79,17 +79,18 @@ function areResourcesEqual(resourcesA: Resource[], resourcesB: Resource[]): bool
     return true;
 }
 
-export function calcAllStates(initState:State, actions: Action[]): State[] {
+export function calcAllStates(initState:State, actions: Action[]): {states: State[], transitions: Transition[]} {
 	let calcQueue = [initState];
 	let calcedStates = [initState];
+	let transitions = [];
 
 	while (calcQueue.length > 0) {
-		const resources = calcQueue.shift()?.resources;
-		if (resources === undefined) continue;
+		const targetState = calcQueue.shift();
+		if (targetState === undefined) continue;
 
 		// Apply all actions to target resources.
 		for (let action of actions) {
-			const newResources = applyAction(resources, action);
+			const newResources = applyAction(targetState.resources, action);
 
 			// If action is failled - skip
 			if (newResources === undefined) continue;
@@ -99,6 +100,16 @@ export function calcAllStates(initState:State, actions: Action[]): State[] {
 			for (let calcedState of calcedStates) {
 				if (areResourcesEqual(calcedState.resources, newResources)) {
 					isNewState = false;
+
+					// Add transition to transitions.
+					const transition = {
+						id: crypto.randomUUID(),
+						label: action.name,
+						source: targetState.id,
+						target: calcedState.id
+					};
+					transitions.push(transition);
+
 					break;
 				}
 			}
@@ -111,8 +122,17 @@ export function calcAllStates(initState:State, actions: Action[]): State[] {
 			};
 			calcQueue = addState(calcQueue, newState);
 			calcedStates = addState(calcedStates, newState);
+
+			// Add transition to transitions.
+			const transition = {
+				id: crypto.randomUUID(),
+				label: action.name,
+				source: targetState.id,
+				target: newState.id
+			};
+			transitions.push(transition);
 		}
 	}
 
-	return calcedStates;
+	return {states: calcedStates, transitions: transitions};
 }

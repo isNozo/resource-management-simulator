@@ -65,7 +65,7 @@
 
   function handleAnalyze(){
     const initState = {id: crypto.randomUUID(), resources: $resources};
-    const states = calcAllStates(initState, $actions);
+    const {states, transitions} = calcAllStates(initState, $actions);
 
     $nodes = [];
     for (let state of states)  {
@@ -76,6 +76,16 @@
         label.push(resourceLabel);
       }
       $nodes.push({id, data:{label}, position:{x:0, y:0}});
+    }
+
+    $edges = [];
+    for (let transition of transitions) {
+      $edges.push({
+        id: transition.id,
+        label: transition.label,
+        source: transition.source,
+        target: transition.target
+      });
     }
   }
 </script>
@@ -88,8 +98,6 @@
     {nodes}
     {edges}
     fitView
-    connectionLineType={ConnectionLineType.SmoothStep}
-    defaultEdgeOptions={{ type: 'smoothstep', animated: true }}
   >
     <Panel position="top-right">
       <button on:click={() => onLayout('TB')}>vertical layout</button>

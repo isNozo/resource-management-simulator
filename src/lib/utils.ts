@@ -61,3 +61,58 @@ export function applyAction(resources: Resource[], action: Action): Resource[] |
 
 	return newResources;
 }
+
+function areResourcesEqual(resourcesA: Resource[], resourcesB: Resource[]): boolean {
+    if (resourcesA.length !== resourcesB.length) {
+        return false;
+    }
+
+    const sortedA = resourcesA.slice().sort((a, b) => a.id.localeCompare(b.id));
+    const sortedB = resourcesB.slice().sort((a, b) => a.id.localeCompare(b.id));
+
+    for (let i = 0; i < sortedA.length; i++) {
+        if (sortedA[i].id !== sortedB[i].id || sortedA[i].amount !== sortedB[i].amount) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function calcAllStates(initState:State, actions: Action[]): State[] {
+	let calcQueue = [initState];
+	let calcedStates = [initState];
+
+	while (calcQueue.length > 0) {
+		const resources = calcQueue.shift()?.resources;
+		if (resources === undefined) continue;
+
+		// Apply all actions to target resources.
+		for (let action of actions) {
+			const newResources = applyAction(resources, action);
+
+			// If action is failled - skip
+			if (newResources === undefined) continue;
+
+			// If newResources equals calcedStates - skip
+			let isNewState = true;
+			for (let calcedState of calcedStates) {
+				if (areResourcesEqual(calcedState.resources, newResources)) {
+					isNewState = false;
+					break;
+				}
+			}
+			if (!isNewState) continue;
+
+			// Add new states to queue and calcedStates.
+			const newState = {
+				id: crypto.randomUUID(),
+				resources: newResources
+			};
+			calcQueue = addState(calcQueue, newState);
+			calcedStates = addState(calcedStates, newState);
+		}
+	}
+
+	return calcedStates;
+}

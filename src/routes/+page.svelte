@@ -3,7 +3,6 @@
 	import ActionList from './ActionList.svelte';
 	import Simulation from './Simulation.svelte';
 	import Flow from './Flow.svelte';
-	import Analyze from './Analyze.svelte';
 	import { resources, actions } from './store';
 </script>
 
@@ -16,7 +15,6 @@
 	Clear Local Storage
 </button>
 
-<Analyze />
 <Simulation />
 <ResourceList />
 <ActionList />

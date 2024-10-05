@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { calcAllStates } from '$lib/utils';
+  import { resources, actions } from './store';
   import { writable } from 'svelte/store';
   import dagre from '@dagrejs/dagre';
   import {
@@ -7,13 +9,13 @@
     Position,
     ConnectionLineType,
     Panel,
+    Controls,
+    MiniMap,
     type Node,
     type Edge
   } from '@xyflow/svelte';
 
   import '@xyflow/svelte/dist/style.css';
-
-  import { initialNodes, initialEdges } from './nodes-and-edges';
 
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -51,25 +53,37 @@
     return { nodes, edges };
   }
 
-  const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-    initialNodes,
-    initialEdges
-  );
-
-  const nodes = writable<Node[]>(layoutedNodes);
-  const edges = writable<Edge[]>(layoutedEdges);
+  const nodes = writable<Node[]>([]);
+  const edges = writable<Edge[]>([]);
 
   function onLayout(direction: string) {
     const layoutedElements = getLayoutedElements($nodes, $edges, direction);
 
     $nodes = layoutedElements.nodes;
     $edges = layoutedElements.edges;
-    // nodes.set(layoutedElements.nodes);
-    // edges.set(layoutedElements.edges);
+  }
+
+  function handleAnalyze(){
+    const initState = {id: crypto.randomUUID(), resources: $resources};
+    const states = calcAllStates(initState, $actions);
+
+    $nodes = [];
+    for (let state of states)  {
+      const id = state.id;
+      const label  = []
+      for (let resource of state.resources)  {
+        const resourceLabel  = `${resource.name}: ${resource.amount}`;
+        label.push(resourceLabel);
+      }
+      $nodes.push({id, data:{label}, position:{x:0, y:0}});
+    }
   }
 </script>
 
-<div style="height:100vh;">
+<h2>Analyze</h2>
+<button on:click={handleAnalyze}>Analyze</button>
+
+<div style="height:500px;">
   <SvelteFlow
     {nodes}
     {edges}
@@ -81,6 +95,8 @@
       <button on:click={() => onLayout('TB')}>vertical layout</button>
       <button on:click={() => onLayout('LR')}>horizontal layout</button>
     </Panel>
+    <Controls />
+    <MiniMap />
     <Background />
   </SvelteFlow>
 </div>

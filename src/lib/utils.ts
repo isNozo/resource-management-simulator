@@ -1,56 +1,42 @@
-export function addResource(resources: Resource[], resource: Resource): Resource[] {
-	return [...resources, resource];
+function addItem<T extends Identifiable>(items: T[], item: T): T[] {
+	return [...items, item];
 }
 
-export function removeResource(resources: Resource[], id: string): Resource[] {
-	return resources.filter((r) => r.id !== id);
+function removeItem<T extends Identifiable>(items: T[], id: string): T[] {
+	return items.filter((item) => item.id !== id);
 }
 
-export function findResource(resources: Resource[], id: string): Resource | undefined {
-	return resources.find((r) => r.id === id);
+function findItem<T extends Identifiable>(items: T[], id: string): T | undefined {
+	return items.find((item) => item.id === id);
 }
 
-export function copyResources(resources: Resource[]): Resource[] {
-	return resources.map((r) => ({...r}));
+function copyItems<T>(items: T[]): T[] {
+	return items.map((item) => ({ ...item }));
 }
 
-export function addAction(actions: Action[], action: Action): Action[] {
-	return [...actions, action];
-}
+export const addResource = (resources: Resource[], resource: Resource) => addItem(resources, resource);
+export const removeResource = (resources: Resource[], id: string) => removeItem(resources, id);
+export const findResource = (resources: Resource[], id: string) => findItem(resources, id);
+export const copyResources = (resources: Resource[]) => copyItems(resources);
 
-export function removeAction(actions: Action[], id: string): Action[] {
-	return actions.filter((a) => a.id !== id);
-}
+export const addAction = (actions: Action[], action: Action) => addItem(actions, action);
+export const removeAction = (actions: Action[], id: string) => removeItem(actions, id);
+export const findAction = (actions: Action[], id: string) => findItem(actions, id);
+export const copyActions = (actions: Action[]) => actions.map((action) => ({
+	id: action.id,
+	name: action.name,
+	consumedResources: copyResources(action.consumedResources),
+	producedResources: copyResources(action.producedResources),
+} as Action));
 
-export function findAction(actions: Action[], id: string): Action | undefined {
-	return actions.find((a) => a.id === id);
-}
-
-export function copyActions(actions: Action[]): Action[] {
-	return actions.map((a) => ({
-		id: a.id,
-		name: a.name,
-		consumedResources: copyResources(a.consumedResources),
-		producedResources: copyResources(a.producedResources)
-	}));
-}
-
-export function addState(states: State[], state: State): State[] {
-	return [...states, state];
-}
-
-export function removeState(states: State[], id: string): State[] {
-	return states.filter((s) => s.id !== id);
-}
-
-export function findState(states: State[], id: string): State | undefined {
-	return states.find((s) => s.id === id);
-}
+export const addState = (states: State[], state: State) => addItem(states, state);
+export const removeState = (states: State[], id: string) => removeItem(states, id);
+export const findState = (states: State[], id: string) => findItem(states, id);
 
 export function isActionApplicable(resources: Resource[], action: Action): boolean {
-	return action.consumedResources.every((r) => {
-		const resource = findResource(resources, r.id);
-		return resource !== undefined && resource.amount >= r.amount;
+	return action.consumedResources.every((consumedResource) => {
+		const resource = findItem(resources, consumedResource.id);
+		return resource !== undefined && resource.amount >= consumedResource.amount;
 	});
 }
 
@@ -59,38 +45,19 @@ export function applyAction(resources: Resource[], action: Action): Resource[] |
 		return undefined;
 	}
 
-	let newResources = copyResources(resources);
-
-	newResources = newResources.map((resource) => {
-		for (let consumedResource of action.consumedResources) {
+	const newResources = copyItems(resources).map((resource) => {
+		action.consumedResources.forEach((consumedResource) => {
 			if (resource.id === consumedResource.id) {
 				resource.amount -= consumedResource.amount;
 			}
-		}
-		for (let producedResource of action.producedResources) {
+		});
+		action.producedResources.forEach((producedResource) => {
 			if (resource.id === producedResource.id) {
 				resource.amount += producedResource.amount;
 			}
-		}
+		});
 		return resource;
 	});
 
 	return newResources;
-}
-
-export function applyAllActions(resources: Resource[], actions: Action[]): State[] {
-	let states : State[] = [];
-
-	actions.forEach(action => {
-		const newResources = applyAction(resources, action);
-		if (newResources) {
-			states = addState(states, {
-				id: action.name,
-				resources: newResources,
-				nextStates: []
-			});
-		}
-	});
-
-	return states;
 }

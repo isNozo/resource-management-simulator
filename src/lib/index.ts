@@ -15,8 +15,6 @@ type Action = {
 type State = {
 	id: string;
 	resources: Resource[];
-	nextStates: {
-		recipeID: string;
-		stateID: string;
-	}[]
 }
+
+type Identifiable = { id: string };

@@ -1,60 +1,86 @@
 <script lang="ts">
-    import { writable } from 'svelte/store';
-    import {
-      SvelteFlow,
-      Controls,
-      Background,
-      BackgroundVariant,
-      MiniMap
-    } from '@xyflow/svelte';
-   
-    // 👇 this is important! You need to import the styles for Svelte Flow to work
-    import '@xyflow/svelte/dist/style.css';
-   
-    // We are using writables for the nodes and edges to sync them easily. When a user drags a node for example, Svelte Flow updates its position.
-    const nodes = writable([
-      {
-        id: '1',
-        type: 'input',
-        data: { label: 'Input Node' },
-        position: { x: 0, y: 0 }
-      },
-      {
-        id: '2',
-        type: 'default',
-        data: { label: 'Node' },
-        position: { x: 0, y: 150 }
-      }
-    ]);
-   
-    // same for edges
-    const edges = writable([
-      {
-        id: '1-2',
-        type: 'default',
-        source: '1',
-        target: '2',
-        label: 'Edge Text'
-      }
-    ]);
-   
-    const snapGrid: [number, number] = [25, 25];
-  </script>
-   
-  <!--
-  👇 By default, the Svelte Flow container has a height of 100%.
-  This means that the parent container needs a height to render the flow.
-  -->
-  <div style:height="500px">
-    <SvelteFlow
-      {nodes}
-      {edges}
-      {snapGrid}
-      fitView
-      on:nodeclick={(event) => console.log('on node click', event.detail.node)}
-    >
-      <Controls />
-      <Background variant={BackgroundVariant.Dots} />
-      <MiniMap />
-    </SvelteFlow>
-  </div>
+  import { writable } from 'svelte/store';
+  import dagre from '@dagrejs/dagre';
+  import {
+    SvelteFlow,
+    Background,
+    Position,
+    ConnectionLineType,
+    Panel,
+    type Node,
+    type Edge
+  } from '@xyflow/svelte';
+
+  import '@xyflow/svelte/dist/style.css';
+
+  import { initialNodes, initialEdges } from './nodes-and-edges';
+
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+  const nodeWidth = 172;
+  const nodeHeight = 36;
+
+  function getLayoutedElements(nodes: Node[], edges: Edge[], direction = 'TB') {
+    const isHorizontal = direction === 'LR';
+    dagreGraph.setGraph({ rankdir: direction });
+
+    nodes.forEach((node) => {
+      dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+    });
+
+    edges.forEach((edge) => {
+      dagreGraph.setEdge(edge.source, edge.target);
+    });
+
+    dagre.layout(dagreGraph);
+
+    nodes.forEach((node) => {
+      const nodeWithPosition = dagreGraph.node(node.id);
+      node.targetPosition = isHorizontal ? Position.Left : Position.Top;
+      node.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
+
+      // We are shifting the dagre node position (anchor=center center) to the top left
+      // so it matches the React Flow node anchor point (top left).
+      node.position = {
+        x: nodeWithPosition.x - nodeWidth / 2,
+        y: nodeWithPosition.y - nodeHeight / 2
+      };
+    });
+
+    return { nodes, edges };
+  }
+
+  const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+    initialNodes,
+    initialEdges
+  );
+
+  const nodes = writable<Node[]>(layoutedNodes);
+  const edges = writable<Edge[]>(layoutedEdges);
+
+  function onLayout(direction: string) {
+    const layoutedElements = getLayoutedElements($nodes, $edges, direction);
+
+    $nodes = layoutedElements.nodes;
+    $edges = layoutedElements.edges;
+    // nodes.set(layoutedElements.nodes);
+    // edges.set(layoutedElements.edges);
+  }
+</script>
+
+<div style="height:100vh;">
+  <SvelteFlow
+    {nodes}
+    {edges}
+    fitView
+    connectionLineType={ConnectionLineType.SmoothStep}
+    defaultEdgeOptions={{ type: 'smoothstep', animated: true }}
+  >
+    <Panel position="top-right">
+      <button on:click={() => onLayout('TB')}>vertical layout</button>
+      <button on:click={() => onLayout('LR')}>horizontal layout</button>
+    </Panel>
+    <Background />
+  </SvelteFlow>
+</div>
